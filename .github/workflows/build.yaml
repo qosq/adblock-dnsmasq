@@ -3,7 +3,7 @@ run-name: build-deploy
 on:
   workflow_dispatch:
   schedule:
-    - cron: '28 4 * * *'
+    - cron: '45 22 * * *'
 permissions:
   pages: write
   id-token: write
