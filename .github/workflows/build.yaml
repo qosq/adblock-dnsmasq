@@ -2,6 +2,8 @@ name: Build
 run-name: build-deploy
 on:
   workflow_dispatch:
+  schedule:
+    - cron: '28 4 * * *'
 permissions:
   contents: write
   pages: write
@@ -9,7 +11,7 @@ permissions:
   
 jobs:
   build-deploy:
-    runs-on: ubuntu-slim
+    runs-on: ubuntu-latest
     steps:
       - name: Build
         run: |
