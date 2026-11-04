@@ -16,6 +16,7 @@ jobs:
         run: |
           export LC_ALL=C
           mkdir deploy
+          touch deploy/dummy
           
           # Hagezi - Pro (mini)
           curl -fsSL "https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/wildcard/pro.mini-onlydomains.txt" > temp
