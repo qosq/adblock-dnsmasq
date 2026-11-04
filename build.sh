@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+set -euo pipefail
+export LC_ALL=C
+
+# Hagezi - Pro (mini)
+curl -fsSL "https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/wildcard/pro.mini-onlydomains.txt" > temp
+# OISD - Small
+curl -fsSL "https://small.oisd.nl/domainswild2" >> temp
+
+cat temp | \
+  # 1. Strip Windows carriage returns (\r)
+  tr -d '\r' | \
+  # 2. Strip comments, whitespace, ABP prefixes (||, ^), and standard hosts file IPs
+  sed -e 's/#.*//' -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' \
+      -e 's/^0\.0\.0\.0[[:space:]]\+//' -e 's/^127\.0\.0\.1[[:space:]]\+//' \
+      -e 's/^||//' -e 's/\^$//' | \
+  # 3. Keep only valid FQDN domain formats
+  grep -E '^([a-zA-Z0-9][-a-zA-Z0-9]*\.)+[a-zA-Z]{2,}$' | \
+  # 4. Normalize to lowercase
+  tr '[:upper:]' '[:lower:]' | \
+  # 5. Reverse domain labels (e.g., "umami.0x2d.dev" -> "dev.0x2d.umami")
+  awk -F'.' '{
+      for (i = NF; i > 1; i--) printf "%s.", $i;
+      print $1;
+  }' | \
+  # 6. Lexicographical sort
+  sort -u | \
+  # 7. Parent Pruner: if "dev.0x2d" exists, skip "dev.0x2d.umami"
+  awk 'NR == 1 { prev = $0; print; next }
+  {
+      if (index($0, prev ".") != 1) {
+          prev = $0;
+          print;
+      }
+  }' | \
+  # 8. Restore original order and format to address=/domain/
+  awk -F'.' '{
+      orig = $NF;
+                for (i = NF - 1; i >= 1; i--) orig = orig "." $i;
+                print "address=/" orig "/";
+  }' > ${1:-dnsmasq}
