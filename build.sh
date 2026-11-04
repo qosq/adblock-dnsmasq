@@ -38,4 +38,4 @@ cat temp | \
       orig = $NF;
                 for (i = NF - 1; i >= 1; i--) orig = orig "." $i;
                 print "address=/" orig "/";
-  }' > ${1:-dnsmasq}
+  }' > ${1:-deploy/dnsmasq}
