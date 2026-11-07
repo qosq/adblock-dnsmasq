@@ -3,7 +3,7 @@ run-name: build-deploy
 on:
   workflow_dispatch:
   schedule:
-    - cron: '30 16 * * *'
+    - cron: '52 16 * * *'
 permissions:
   contents: read
   pages: write
