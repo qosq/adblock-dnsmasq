@@ -3,6 +3,8 @@ run-name: build-deploy
 on:
   workflow_dispatch:
   repository_dispatch:
+    types:
+      - crontap
 permissions:
   contents: read
   pages: write
